@@ -22,6 +22,7 @@ import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
@@ -153,6 +154,19 @@ public class Addon {
       this.logger.error("https://github.com/Elytrium/LimboAuth-SocialAddon/releases/");
       this.logger.error("****************************************");
     }
+  }
+
+  @Subscribe
+  public void onProxyShutdown(ProxyShutdownEvent event) {
+    if (this.socialManager != null) {
+      this.socialManager.stop();
+    }
+
+    this.server.getEventManager().unregisterListeners(this);
+
+    CommandManager commandManager = this.server.getCommandManager();
+    commandManager.unregister(Settings.IMP.MAIN.LINKAGE_MAIN_CMD);
+    commandManager.unregister(Settings.IMP.MAIN.FORCE_UNLINK_MAIN_CMD);
   }
 
   @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "LEGACY_AMPERSAND can't be null in velocity.")
